@@ -22,6 +22,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.mysql.cj.protocol.Resultset;
+
 public class MyTestCases {
 
     WebDriver driver = new ChromeDriver();
@@ -35,8 +37,8 @@ public class MyTestCases {
    Random rand = new Random();
     String Phone;
     String CompanyName;
-    
-
+   Resultset rs;
+    int randomId ; 
     @BeforeTest
     public void MyTestSetUp() throws SQLException {
         con = DriverManager.getConnection("jdbc:mysql://localhost:3306/classicmodels","root","123456");
@@ -159,10 +161,68 @@ public class MyTestCases {
         ReloadButton.click();
     }
 
-    @Test(enabled = true)
+    
+    @Test(priority = 1)
+    public void AddToData() throws SQLException {
+
+        int randomId = rand.nextInt(5353, 6010);
+
+        String QueryToAddData =
+                "INSERT INTO customers (" +
+                "customerNumber, " +
+                "customerName, " +
+                "contactLastName, " +
+                "contactFirstName, " +
+                "phone, " +
+                "addressLine1, " +
+                "city, " +
+                "country, " +
+                "salesRepEmployeeNumber, " +
+                "creditLimit" +
+                ") VALUES (" +
+                randomId + ", " +
+                "'Test Company', " +
+                "'Smith', " +
+                "'John', " +
+                "'+1 202 555 0123', " +
+                "'123 Test Street', " +
+                "'Amman', " +
+                "'Jordan', " +
+                "1370, " +
+                "50000.00" +
+                ");";
+
+        stmt = con.createStatement();
+        int RowInserted = stmt.executeUpdate(QueryToAddData);
+
+        System.out.println(RowInserted);
+    }
+
+    @Test(priority = 2)
+    public void UpdateCustomerData() throws SQLException {
+
+        String QueryToUpdate =
+                "UPDATE customers SET " +
+                "contactFirstName = 'tayseer', " +
+                "contactLastName = 'alhamad' " +
+                "WHERE customerNumber = " + randomId + ";";
+
+        stmt = con.createStatement();
+        int RowsUpdated = stmt.executeUpdate(QueryToUpdate);
+
+        System.out.println(RowsUpdated);
+    }
+
+
+    
+
+    @Test(priority = 3)
     public void CalendarExample() throws InterruptedException, SQLException {
         
-            // فتح صفحة الحجز
+           
+    	
+    	
+    	
             WebElement Calender = driver.findElement(By.linkText("Booking Calendar"));
             Calender.click();
             Thread.sleep(1000);
@@ -172,10 +232,12 @@ public class MyTestCases {
             driver.switchTo().window(AllTabs.get(1));
           
            Thread.sleep(1000);
-           
-          
-            int RandomId = rand.nextInt(144,147);
-            String QueryToRead = "select *from  customers where customerNumber =" +RandomId;
+            int randomId = rand.nextInt(144,147);
+            
+            
+            
+            
+            String QueryToRead = "select *from  customers where customerNumber =" +randomId;
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(QueryToRead);
             while(rs.next()) {
@@ -196,6 +258,23 @@ public class MyTestCases {
             driver.findElement(By.id("details1")).sendKeys(CompanyName);
             
             
+            
 }
+    @Test( enabled= false)
+    public void DeleteCustomerData() throws SQLException {
+
+        System.out.println(randomId);
+
+        String QueryToDelete =
+                "DELETE FROM customers " +
+                "WHERE customerNumber = " + randomId + ";";
+
+        stmt = con.createStatement();
+        int RowsDeleted = stmt.executeUpdate(QueryToDelete);
+
+        System.out.println(RowsDeleted);
+        
+    }
+
 
 }
